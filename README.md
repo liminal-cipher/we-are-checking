@@ -140,6 +140,10 @@ of them. HTTP responses are cached under `cache/`, which is not tracked.
 No API key or environment variable is needed. Jolpica is open and
 unauthenticated.
 
+For exploration, `pip install -r requirements-dev.txt` adds JupyterLab, and
+`notebooks/01-explore.ipynb` loads the parquet directory into one frame.
+Notebooks are scratch space: anything worth keeping graduates to `scripts/`.
+
 ## Responsible AI
 
 The data is public sporting results. It carries the names of professional
