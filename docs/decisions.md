@@ -80,6 +80,26 @@ boundary is written down where a reader will hit it.
 forbids. That would mean dropping the committed data and fetching at runtime,
 or moving to a differently-licensed source.
 
+## 2026-08-11 Lagged features come before pulling qualifying data
+
+**Context.** The race results table holds one column that is knowable before a
+race starts: `grid`. Everything else is either an identifier or an outcome.
+There are two ways to get more input: derive it from earlier rounds, or pull
+Jolpica's qualifying endpoint for Q1/Q2/Q3 lap times.
+
+**Decision.** Build the lagged features first. The qualifying loader waits
+until they exist and have been scored.
+
+**Why.** Qualifying times are strong enough that adding them at the same time
+as the first hand-built features would make the two indistinguishable: if the
+model improves, we would not know which change did it. Starting with a thin
+input set also makes leakage easier to see, because there are few enough
+columns to check each one by hand.
+
+**Revisit if.** The lagged features fail to beat a grid-only baseline. That
+would be a signal that the information is not in the results table, which is
+the case for adding qualifying rather than an argument against it.
+
 ## 2026-08-11 Pagination is driven by an explicit offset
 
 **Context.** FastF1's response objects expose `is_complete` and
