@@ -1,4 +1,4 @@
-# we-are-checking
+# We Are Checking
 
 > Pre-race top-10 predictions committed before every round, calibration tracked across the season
 
@@ -22,6 +22,11 @@ the time?
 Top 10 is the target because it is the points boundary, so it is the split the
 sport itself cares about, and because it stays close enough to balanced that
 accuracy is not trivially gamed by always guessing "no".
+
+The name is team radio boilerplate: what an engineer says when a driver asks
+whether a rival is under investigation, usually meaning nobody has checked yet.
+
+*Here, we really are.*
 
 ## What It Does
 
