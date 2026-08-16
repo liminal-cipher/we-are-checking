@@ -167,3 +167,34 @@ once or it will commit outputs again.
 **Revisit if.** A notebook's rendered output becomes something worth
 publishing (a results notebook, say). That file can be exempted with a
 narrower `.gitattributes` rule rather than dropping the filter.
+
+## 2026-08-17 Time split at 2025, scored per season, over a grid-rule baseline
+
+**Context.** Features need a held-out set to be judged on and a floor to be
+judged against. The data runs 2018 through 2026 round 11 (3,700 rows), and
+2026 is the first season under the new power-unit and chassis regulations,
+so the seasons are not interchangeable.
+
+**Decision.** Train is every season through 2024 (2,979 rows). Test is 2025
+onward (721 rows, 19.5% of the data). Every score is reported pooled and
+per season, never pooled alone. The baseline predicts top ten exactly when
+`grid <= 10`; on the test set it scores 0.7725 (0.779 on 2025, 0.760 on
+2026, difference within noise at these sizes).
+
+**Why.** The split mimics deployment: learn on the past, predict the near
+future. Testing on 2026 alone matches the deployed regime best, but 242
+rows put roughly a six-point noise band around a score, which swallows the
+few points a feature can realistically add. Adding 2025 roughly halves
+that band, and the per-season breakdown keeps the regulation reset visible
+instead of averaging it away. 2024 stays in train because the season
+nearest the test window is the most informative one to learn from, and
+moving it out would cut train by 16% to buy little precision. The baseline
+is a rule rather than a fitted model because one monotone feature decides
+through a threshold anyway, and a rule cannot silently peek at anything.
+The 45 pit-lane rows (`grid == 0`) all fall in train, so this number does
+not depend on how that question is later resolved.
+
+**Revisit if.** The 2026 season fills in enough that a 2026-only test is
+no longer starved, or the work starts needing predicted probabilities
+(calibration), which a bare rule cannot produce; the baseline then
+graduates to a logistic regression on `grid` alone.
