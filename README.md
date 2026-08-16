@@ -148,6 +148,8 @@ unauthenticated.
 For exploration, `pip install -r requirements-dev.txt` adds JupyterLab, and
 `notebooks/01-explore.ipynb` loads the parquet directory into one frame.
 Notebooks are scratch space: anything worth keeping graduates to `scripts/`.
+Run `nbstripout --install` once after cloning; it activates the filter that
+keeps notebook outputs out of commits (outputs stay in your working copy).
 
 ## Responsible AI
 

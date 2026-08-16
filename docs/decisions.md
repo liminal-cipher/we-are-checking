@@ -141,3 +141,29 @@ can read the directory as one partitioned dataset later without renaming.
 **Revisit if.** We start needing cross-season reads often enough that opening
 nine files is friction. `pd.read_parquet` on the directory already handles it,
 so this is unlikely.
+
+## 2026-08-17 Notebook outputs are stripped at commit time
+
+**Context.** `notebooks/01-explore.ipynb` was committed with its outputs
+embedded. At one feature the notebook already carried ~800 lines of output
+JSON, and every re-run rewrites them all, so the diff of a notebook commit
+was mostly noise around a few changed lines of code.
+
+**Decision.** `nbstripout` runs as a git clean filter, declared in
+`.gitattributes` and activated per clone with `nbstripout --install`
+(installed via `requirements-dev.txt`). The committed copy of a notebook
+has no outputs; the working copy keeps them. The existing notebook was
+renormalized under the filter.
+
+**Why.** A filter at staging time is the only variant that needs no
+remembering. Local outputs survive, so nothing explored is lost to the
+person exploring. The repo's public claim rests on committed predictions
+and their timestamps, never on cell outputs, and the README already says
+notebooks are scratch space: anything worth keeping graduates to
+`scripts/`. The cost is that the GitHub rendering of a notebook shows code
+without results, and that a fresh clone must run `nbstripout --install`
+once or it will commit outputs again.
+
+**Revisit if.** A notebook's rendered output becomes something worth
+publishing (a results notebook, say). That file can be exempted with a
+narrower `.gitattributes` rule rather than dropping the filter.
