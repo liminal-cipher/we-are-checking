@@ -2,3 +2,4 @@
 
 jupyterlab>=4.2
 ipykernel>=6.29
+nbstripout>=0.7
