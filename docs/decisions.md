@@ -226,3 +226,30 @@ computed from test-period outcomes.
 ensembles), which makes the fill unnecessary, or the single global
 constant gives way to a finer prior (per-team, per-season) once there is
 evidence the global one is what is losing rows.
+
+## 2026-08-17 Pit-lane starts are recoded to the back of their race
+
+**Context.** `grid == 0` marks a pit-lane start (45 rows, all in train).
+On the grid scale smaller means further forward, so a literal zero reads
+as a slot ahead of pole. The `grid <= 10` baseline rule swallowed this
+quietly, but a fitted model consuming grid as a number would learn that
+pit-lane starters have the best starting spot in the field, which is the
+opposite of the truth.
+
+**Decision.** A new column `grid_effective` copies `grid` and replaces
+zeros with that race's maximum grid plus one. The original column stays
+untouched. Models consume `grid_effective`.
+
+**Why.** A pit-lane starter joins the race after every gridded car, so
+the honest position is behind the last occupied slot of that race. The
+replacement is computed per race rather than hardcoded as 21 because the
+field size is not a constant: races with pit-lane starters leave the back
+of the grid empty (per-race maxima of 17 and 19 appear in the data), and
+2026 runs 22 cars. Any fixed number retells the same lie whenever the
+field size changes.
+
+**Revisit if.** The model becomes one that can learn special cases from a
+flag (tree ensembles), where `grid == 0` plus an indicator column may
+carry more signal than folding pit-laners in with back-markers, since a
+pit-lane start often marks a penalty or a rebuilt car rather than slow
+qualifying pace.
