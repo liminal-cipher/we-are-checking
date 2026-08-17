@@ -38,7 +38,10 @@ whether a rival is under investigation, usually meaning nobody has checked yet.
   round.
 - Scores the season's committed predictions for calibration, not just accuracy.
 
-Today only the first of these exists. The rest are tracked in Roadmap.
+Today the first exists as a script, and the second is taking shape in the
+exploration notebook along with a time split, a baseline, and a first
+fitted model. No prediction has been committed yet. The rest is tracked in
+Roadmap.
 
 ## Architecture
 
@@ -98,7 +101,7 @@ race, and only for races on the Jolpica calendar.
 | Coverage | 2018 to present, one row per driver per race |
 | Scale | roughly 20 drivers x 21 to 24 rounds per season |
 | Committed | yes, `data/raw/race_results/` is tracked (see decisions.md) |
-| Split strategy | not yet designed |
+| Split strategy | time split: train through 2024, test 2025 onward (721 rows), scored pooled and per season |
 
 **Data license differs from this repo's.** The code here is MIT. Jolpica's data
 is licensed CC BY-NC-SA 4.0, which is share-alike and non-commercial, and that
@@ -108,22 +111,50 @@ pull script is built to skip work rather than repeat it.
 
 ## Evaluation
 
-Not yet designed. This section is deliberately empty rather than deleted: the
-evaluation protocol is the part of the project being written by hand, and it
-will record the metric and why it was chosen, the train and test split, the
-leakage controls, the baseline being beaten, and the seeds and run count.
+Partly in place, written by hand in the notebook and recorded in
+decisions.md:
 
-The one thing already fixed is that the season's scoring runs against the
-committed prediction files, not against predictions regenerated later.
+- **Metric**: accuracy for now, because the baseline is a hard rule that
+  cannot produce probabilities. Calibration becomes the metric once
+  predicted probabilities are committed.
+- **Split**: train is every season through 2024 (2,979 rows), test is 2025
+  onward (721 rows). Every score is read pooled and per season, so the
+  2026 regulation reset is never averaged away.
+- **Leakage controls**: features use only pre-race information; the lagged
+  feature is verified against a plain-Python rebuild in the notebook; and
+  any number a model consumes (such as the NaN fill value) is computed on
+  train only.
+- **Baseline**: predict a top-10 finish exactly when `grid <= 10`.
+
+Still open: seeds and run counts (nothing stochastic is in use yet), and
+the calibration protocol itself.
+
+The one thing fixed from the start is that the season's scoring runs
+against the committed prediction files, not against predictions
+regenerated later.
 
 ## Results
 
-Not yet measured. No model has been trained and no prediction has been
-committed.
+First numbers, measured on the test set (2025 onward, 721 rows):
+
+| Model | Pooled | 2025 | 2026 |
+|---|---|---|---|
+| Rule: `grid <= 10` | **0.7725** | 0.779 | 0.760 |
+| Logistic regression: form only | 0.6976 | 0.685 | 0.723 |
+
+Form is the share of the driver's previous five races that ended in the
+top 10, with a driver's first five races filled by the train base rate.
+Losing by 7.5 points reads as "where you start this weekend carries more
+information than how your last five races went", not as form being
+useless. Whether form adds anything on top of grid is the comparison
+currently in progress.
+
+No prediction has been committed yet.
 
 ## Model & Inference
 
-Classifier not yet selected. Inference is intended to run in GitHub Actions
+Classifier not yet selected; the first candidate under test is a plain
+logistic regression. Inference is intended to run in GitHub Actions
 before each round, so the constraint it will be chosen under is that a full
 refit plus prediction fits comfortably in a free-tier runner without a GPU.
 
@@ -166,17 +197,18 @@ edited or deleted after the fact, including the bad ones.
 ## Roadmap
 
 - [x] Repo scaffolding, data pull, one parquet per season
-- [ ] Pre-race feature set, with a written argument that each feature is knowable before the race
-- [ ] Train and test split that respects time order
-- [ ] Baseline to beat (grid position alone)
+- [ ] Pre-race feature set, with a written argument that each feature is knowable before the race (first feature built and scored)
+- [x] Train and test split that respects time order
+- [x] Baseline to beat (grid position alone)
 - [ ] Calibration report, committed predictions vs. results
 - [ ] GitHub Actions workflow that commits predictions before each round
 
 ## Status
 
-In progress. Personal project, started 2026-08-11. Only the data loader runs
-today; no model has been trained and no prediction has been committed. Last
-updated 2026-08-11.
+In progress. Personal project, started 2026-08-11. The data loader runs; the
+first feature, the time split, the grid-rule baseline, and a first fitted
+model live in the exploration notebook. No prediction has been committed
+yet. Last updated 2026-08-17.
 
 ## License
 
