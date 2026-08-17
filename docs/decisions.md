@@ -198,3 +198,31 @@ not depend on how that question is later resolved.
 no longer starved, or the work starts needing predicted probabilities
 (calibration), which a bare rule cannot produce; the baseline then
 graduates to a logistic regression on `grid` alone.
+
+## 2026-08-17 Lagged-feature NaN is filled with the train base rate
+
+**Context.** `top10_rate_last5` is NaN on each driver's first five career
+races (213 rows across the data, including rookies' debut races in the
+test seasons). The baseline is scored on all 721 test rows. A model that
+consumes the feature has to do something with those cells: drop the rows,
+fill them, or use a model that accepts NaN natively.
+
+**Decision.** No rows are dropped anywhere. NaN cells are filled with one
+constant: the positive rate of `top10` measured on train only (2018-2024).
+The same constant fills NaN in both train and test.
+
+**Why.** Dropping breaks the comparison. The rows that vanish are not
+random: they are exactly the rows with the least information, and removing
+them scores the model on an easier track than the baseline's 0.7725. A
+fill of 0 or 1 fabricates a recent record the driver does not have; the
+base rate is the honest statement of ignorance, the probability that a
+random ride in the data finishes top ten. It is measured rather than
+assumed as 10/20 because the field is not always twenty classified cars
+(non-starters, entry-count changes), and it is measured on train only
+because a number the model consumes at prediction time must not be
+computed from test-period outcomes.
+
+**Revisit if.** The model changes to one that handles NaN natively (tree
+ensembles), which makes the fill unnecessary, or the single global
+constant gives way to a finer prior (per-team, per-season) once there is
+evidence the global one is what is losing rows.
