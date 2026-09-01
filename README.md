@@ -196,12 +196,12 @@ edited or deleted after the fact, including the bad ones.
 
 ## Roadmap
 
-- [x] Repo scaffolding, data pull, one parquet per season
-- [ ] Pre-race feature set, with a written argument that each feature is knowable before the race (first feature built and scored)
-- [x] Train and test split that respects time order
-- [x] Baseline to beat (grid position alone)
-- [ ] Calibration report, committed predictions vs. results
-- [ ] GitHub Actions workflow that commits predictions before each round
+- [x] **Data pipeline**: Repo scaffolding, historical data pull, and one parquet per season.
+- [ ] **Pre-race feature set**: Written verification that each feature is strictly knowable before race start.
+- [x] **Temporal validation split**: Train and test split that respects chronological time order.
+- [x] **Baseline benchmark**: Grid position rule baseline to establish lower bound.
+- [ ] **Calibration report**: Systematic tracking of committed predictions vs. actual race outcomes.
+- [ ] **Automated workflow**: GitHub Actions workflow that commits predictions before each race weekend.
 
 ## Status
 
