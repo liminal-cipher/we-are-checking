@@ -2,7 +2,7 @@
 
 > Pre-race top-10 predictions committed before every round, calibration tracked across the season
 
-![Python](https://img.shields.io/badge/python-3.12-blue)
+![Python](https://img.shields.io/badge/python-3.13-blue)
 ![Data](https://img.shields.io/badge/data-Jolpica--F1-e10600)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
