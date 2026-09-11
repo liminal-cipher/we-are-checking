@@ -244,21 +244,12 @@ This should ultimately be generated from code rather than maintained manually in
 
 ## Current Priority
 
-Do not expand the search space yet.
+Phase 1 feature integrity and the Phase 2 grid-versus-form comparison are
+complete. The result and its interpretation are recorded in
+`docs/decisions.md`.
 
-The immediate experiment remains:
-
-```text
-Logistic Regression(grid_effective)
-
-vs.
-
-Logistic Regression(
-    grid_effective,
-    top10_rate_last5
-)
-```
-
-under the existing preprocessing and temporal split.
-
-After that comparison is complete, introduce walk-forward validation before using the historical data for broader feature, lookback, preprocessing, model, and hyperparameter selection.
+Do not expand the search space on the repeatedly inspected historical holdout.
+Before broader feature, lookback, preprocessing, model, or hyperparameter
+selection, introduce the expanding-window walk-forward validation defined
+above. The 2025-onward holdout remains an out-of-time reference rather than the
+selection set for those experiments.
