@@ -111,8 +111,8 @@ pull script is built to skip work rather than repeat it.
 
 ## Evaluation
 
-Partly in place, written by hand in the notebook and recorded in
-decisions.md:
+The maintained evaluation is `scripts/evaluate_pre_race_features.py`; the
+reasoning behind it is recorded in `decisions.md`:
 
 - **Metric**: accuracy for now, because the baseline is a hard rule that
   cannot produce probabilities. Calibration becomes the metric once
@@ -120,10 +120,10 @@ decisions.md:
 - **Split**: train is every season through 2024 (2,979 rows), test is 2025
   onward (721 rows). Every score is read pooled and per season, so the
   2026 regulation reset is never averaged away.
-- **Leakage controls**: features use only pre-race information; the lagged
-  feature is verified against a plain-Python rebuild in the notebook; and
-  any number a model consumes (such as the NaN fill value) is computed on
-  train only.
+- **Leakage controls**: feature integrity checks pass on the committed parquet
+  data. The script verifies race order, independently rebuilds the lagged
+  feature, checks the grid recode, and computes the NaN fill value on train
+  only.
 - **Baseline**: predict a top-10 finish exactly when `grid <= 10`.
 
 Still open: seeds and run counts (nothing stochastic is in use yet), and
@@ -135,19 +135,22 @@ regenerated later.
 
 ## Results
 
-First numbers, measured on the test set (2025 onward, 721 rows):
+Accuracy on the test set (2025 onward, 721 rows):
 
 | Model | Pooled | 2025 | 2026 |
 |---|---|---|---|
-| Rule: `grid <= 10` | **0.7725** | 0.779 | 0.760 |
+| Rule: `grid <= 10` | **0.7725** | 0.7787 | 0.7603 |
 | Logistic regression: form only | 0.6976 | 0.685 | 0.723 |
+| Logistic regression: `grid_effective` only | **0.7725** | 0.7787 | 0.7603 |
+| Logistic regression: `grid_effective` + form | 0.7573 | 0.7641 | 0.7438 |
 
-Form is the share of the driver's previous five races that ended in the
-top 10, with a driver's first five races filled by the train base rate.
-Losing by 7.5 points reads as "where you start this weekend carries more
-information than how your last five races went", not as form being
-useless. Whether form adds anything on top of grid is the comparison
-currently in progress.
+The grid-only logistic regression and the hard rule produce the same prediction
+on all 721 test rows. Form is the share of the driver's previous five races
+that ended in the top 10, with missing values filled by the 2018-2024 train
+positive rate. Adding it reduces pooled accuracy by 0.0153 and also reduces
+accuracy in both test seasons. Under this feature definition and default
+logistic-regression classification, recent form provides no incremental
+accuracy over grid. This does not show that form is generally uninformative.
 
 No prediction has been committed yet.
 
@@ -166,6 +169,7 @@ python -m venv .venv
 pip install -r requirements.txt
 
 python scripts/pull_race_results.py
+python scripts/evaluate_pre_race_features.py
 ```
 
 The first run fetches every season from 2018 and writes
@@ -197,7 +201,7 @@ edited or deleted after the fact, including the bad ones.
 ## Roadmap
 
 - [x] **Data pipeline**: Repo scaffolding, historical data pull, and one parquet per season.
-- [ ] **Pre-race feature set**: Written verification that each feature is strictly knowable before race start.
+- [x] **Pre-race feature set**: Reproducible integrity checks for grid and lagged form features.
 - [x] **Temporal validation split**: Train and test split that respects chronological time order.
 - [x] **Baseline benchmark**: Grid position rule baseline to establish lower bound.
 - [ ] **Calibration report**: Systematic tracking of committed predictions vs. actual race outcomes.
@@ -205,10 +209,10 @@ edited or deleted after the fact, including the bad ones.
 
 ## Status
 
-In progress. Personal project, started 2026-08-11. The data loader runs; the
-first feature, the time split, the grid-rule baseline, and a first fitted
-model live in the exploration notebook. No prediction has been committed
-yet. Last updated 2026-08-17.
+In progress. Personal project, started 2026-08-11. The data loader and
+pre-race feature audit run locally; grid and form have been compared on the
+fixed temporal holdout. No prediction has been committed yet. Last updated
+2026-09-12.
 
 ## License
 
