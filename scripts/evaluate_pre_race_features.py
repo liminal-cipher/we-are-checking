@@ -1,8 +1,9 @@
-"""Audit current pre-race features and run the grid/form ablation.
+"""Audit current pre-race features and run grid/form evaluations.
 
 The evaluation deliberately keeps the established 2018-2024 train split,
 2025-onward test split, train-only form imputation, and default logistic
-regression configuration.
+regression configuration. Historical model selection uses expanding-window
+walk-forward folds.
 """
 
 from __future__ import annotations
@@ -18,6 +19,12 @@ RACE_RESULTS = REPO_ROOT / "data" / "raw" / "race_results"
 TRAIN_END_SEASON = 2024
 TEST_START_SEASON = 2025
 FORM_WINDOW = 5
+WALK_FORWARD_START_SEASON = 2018
+WALK_FORWARD_FOLDS = (
+    (2021, 2022),
+    (2022, 2023),
+    (2023, 2024),
+)
 
 
 def require(condition: bool, message: str) -> None:
@@ -225,12 +232,71 @@ def evaluate(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, float | int]]:
     return scores, comparison
 
 
+def evaluate_walk_forward(df: pd.DataFrame) -> pd.DataFrame:
+    """Score the current grid/form models on expanding historical folds."""
+    feature_sets = {
+        "grid_only": ["grid_effective"],
+        "grid_plus_form": ["grid_effective", "top10_rate_last5"],
+    }
+    rows: list[dict[str, float | int | str]] = []
+
+    for train_end_season, validation_season in WALK_FORWARD_FOLDS:
+        train = df[
+            df["season"].between(WALK_FORWARD_START_SEASON, train_end_season)
+        ].copy()
+        validation = df[df["season"] == validation_season].copy()
+        require(
+            not train.empty,
+            f"walk-forward training split through {train_end_season} is empty",
+        )
+        require(
+            not validation.empty,
+            f"walk-forward validation season {validation_season} is empty",
+        )
+
+        train_positive_rate = float(train["top10"].mean())
+        accuracies: dict[str, float] = {}
+        for feature_set_name, features in feature_sets.items():
+            x_train = train[features].copy()
+            x_validation = validation[features].copy()
+            if "top10_rate_last5" in features:
+                x_train["top10_rate_last5"] = x_train[
+                    "top10_rate_last5"
+                ].fillna(train_positive_rate)
+                x_validation["top10_rate_last5"] = x_validation[
+                    "top10_rate_last5"
+                ].fillna(train_positive_rate)
+
+            model = LogisticRegression()
+            model.fit(x_train, train["top10"])
+            prediction = model.predict(x_validation)
+            accuracies[feature_set_name] = float(
+                (prediction == validation["top10"]).mean()
+            )
+
+        rows.append(
+            {
+                "train_seasons": (
+                    f"{WALK_FORWARD_START_SEASON}-{train_end_season}"
+                ),
+                "validation_season": validation_season,
+                "grid_only": accuracies["grid_only"],
+                "grid_plus_form": accuracies["grid_plus_form"],
+                "delta": accuracies["grid_plus_form"] - accuracies["grid_only"],
+                "train_positive_rate": train_positive_rate,
+            }
+        )
+
+    return pd.DataFrame(rows).set_index("validation_season")
+
+
 def main() -> int:
     raw = pd.read_parquet(RACE_RESULTS)
     validate_race_order(raw)
     featured = build_features(raw)
     audit = validate_features(featured)
     scores, comparison = evaluate(featured)
+    walk_forward = evaluate_walk_forward(featured)
 
     print("Feature integrity: PASS")
     for name, value in audit.items():
@@ -252,6 +318,8 @@ def main() -> int:
             print(f"  {name}: {value:.4f}")
         else:
             print(f"  {name}: {value}")
+    print("\nExpanding-window walk-forward accuracy")
+    print(walk_forward.to_string(float_format=lambda value: f"{value:.4f}"))
     return 0
 
 
