@@ -244,12 +244,14 @@ This should ultimately be generated from code rather than maintained manually in
 
 ## Current Priority
 
-Phase 1 feature integrity and the Phase 2 grid-versus-form comparison are
-complete. The result and its interpretation are recorded in
-`docs/decisions.md`.
+Phase 1 feature integrity, the Phase 2 grid-versus-form comparison, and the
+initial expanding-window walk-forward validation are complete. The current
+five-race form feature improves two validation seasons but regresses in 2024,
+so it does not show consistent incremental accuracy across all three folds.
+The result and its interpretation are recorded in `docs/decisions.md`.
 
-Do not expand the search space on the repeatedly inspected historical holdout.
-Before broader feature, lookback, preprocessing, model, or hyperparameter
-selection, introduce the expanding-window walk-forward validation defined
-above. The 2025-onward holdout remains an out-of-time reference rather than the
-selection set for those experiments.
+Do not use the repeatedly inspected 2025-onward holdout to choose the next
+configuration; it remains an out-of-time reference. Before implementation,
+define one focused modeling hypothesis and change only the experiment dimension
+needed to test that question. Do not select a final feature set or model from
+the current mixed form result alone.

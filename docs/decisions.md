@@ -254,33 +254,32 @@ carry more signal than folding pit-laners in with back-markers, since a
 pit-lane start often marks a penalty or a rebuilt car rather than slow
 qualifying pace.
 
-## 2026-09-12 Recent form does not advance past the grid ablation
+## 2026-09-12 Recent form is not consistently additive across walk-forward folds
 
-**Context.** Form alone trails the grid rule, but that does not answer whether
-`top10_rate_last5` adds information after the model already knows the starting
-grid. The required comparison is two otherwise identical logistic regressions
-on the fixed temporal holdout: `grid_effective` alone, then `grid_effective`
-plus form. Missing form values in both splits use the 2018-2024 train positive
-rate of 0.500167841558.
+**Context.** The fixed 2025-onward holdout initially suggested that
+`top10_rate_last5` did not add accuracy after the model knew
+`grid_effective`, but that holdout had already been inspected repeatedly.
+Historical model selection therefore moved to the documented expanding-window
+walk-forward folds while keeping the feature definitions, train-only
+imputation, default `LogisticRegression`, and accuracy metric unchanged.
 
-Before fitting, the integrity checks pass: race order is chronological,
-`top10_rate_last5` matches an independent rebuild from prior outcomes, and
-`grid_effective` matches the intended per-race recode.
+The walk-forward results are:
 
-**Decision.** Do not carry `top10_rate_last5` forward in its current form. The
-grid-only model scores 0.7725 pooled (0.7787 in 2025, 0.7603 in 2026), and its
-721 test predictions exactly match the existing `grid <= 10` hard baseline.
-Adding form scores 0.7573 pooled (0.7641 in 2025, 0.7438 in 2026), a 0.0153
-decrease.
+- 2018-2021 -> 2022: 0.7318 grid-only, 0.7568 with form, +0.0250.
+- 2018-2022 -> 2023: 0.7364 grid-only, 0.7682 with form, +0.0318.
+- 2018-2023 -> 2024: 0.8372 grid-only, 0.8309 with form, -0.0063.
 
-**Why.** An incremental feature has to improve the model that already contains
-the strongest available pre-race signal. The decrease appears both pooled and
-in each test season, so aggregation across the 2026 regulation boundary is not
-hiding a gain. Under the current feature definition and default logistic-
-regression classification, recent form provides no incremental accuracy over
-grid. This is not evidence that driver form is generally uninformative.
+**Decision.** Do not make a final feature-selection decision from the current
+result. Under the current five-race definition and logistic-regression setup,
+`top10_rate_last5` does not show consistent incremental accuracy across all
+three validation seasons.
 
-**Revisit if.** The form definition, prediction target, or evaluation metric
-changes as a deliberate new experiment, or substantially more out-of-time data
-becomes available. Do not reinterpret this result through tuning on the same
-holdout.
+**Why.** Form improves accuracy in the 2022 and 2023 folds but regresses in
+2024. That mixed result does not support either selecting grid-only as the
+final model or claiming that recent form is generally uninformative. The
+2025-onward holdout remains an out-of-time reference rather than a
+model-selection set.
+
+**Revisit if.** A deliberate experiment changes the form definition,
+prediction target, preprocessing, model family, or evaluation metric, or
+substantially more prospective evidence becomes available.
