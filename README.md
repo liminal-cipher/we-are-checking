@@ -4,7 +4,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.13-blue)
 ![Data](https://img.shields.io/badge/data-Jolpica--F1-e10600)
-![License](https://img.shields.io/badge/license-MIT-green)
+![Licence](https://img.shields.io/badge/license-MIT-green)
 
 ## Motivation
 
@@ -100,19 +100,19 @@ race, and only for races on the Jolpica calendar.
 | Accessed via | `fastf1.ergast.Ergast` |
 | Coverage | 2018 to present, one row per driver per race |
 | Scale | roughly 20 drivers x 21 to 24 rounds per season |
-| Committed | yes, `data/raw/race_results/` is tracked (see decisions.md) |
+| Committed | yes, `data/raw/race_results/` is tracked (see [decisions.md](docs/decisions.md)) |
 | Split strategy | time split: train through 2024, test 2025 onward (721 rows), scored pooled and per season |
 
-**Data license differs from this repo's.** The code here is MIT. Jolpica's data
+**Data licence differs from this repo's.** The code here is MIT. Jolpica's data
 is licensed CC BY-NC-SA 4.0, which is share-alike and non-commercial, and that
-license travels with the parquet files under `data/`. Jolpica is volunteer-run
+licence travels with the parquet files under `data/`. Jolpica is volunteer-run
 and rate limited to 4 requests per second and 500 per hour, which is why the
 pull script is built to skip work rather than repeat it.
 
 ## Evaluation
 
 The maintained evaluation is `scripts/evaluate_pre_race_features.py`; the
-reasoning behind it is recorded in `decisions.md`:
+reasoning behind it is recorded in [decisions.md](docs/decisions.md):
 
 - **Metric**: accuracy for now, because the baseline is a hard rule that
   cannot produce probabilities. Calibration becomes the metric once
@@ -190,7 +190,7 @@ keeps notebook outputs out of commits (outputs stay in your working copy).
 
 The data is public sporting results. It carries the names of professional
 drivers acting in their public capacity, and no personal data beyond that, so
-there is nothing here to anonymize or expire.
+there is nothing here to anonymise or expire.
 
 The live risk in a project like this is not privacy but overclaiming. A
 probability presented without its calibration record invites more confidence
@@ -200,12 +200,12 @@ edited or deleted after the fact, including the bad ones.
 
 ## Roadmap
 
-- [x] **Data pipeline**: Repo scaffolding, historical data pull, and one parquet per season.
-- [x] **Pre-race feature set**: Reproducible integrity checks for grid and lagged form features.
-- [x] **Temporal validation split**: Train and test split that respects chronological time order.
-- [x] **Baseline benchmark**: Grid position rule baseline to establish lower bound.
-- [ ] **Calibration report**: Systematic tracking of committed predictions vs. actual race outcomes.
-- [ ] **Automated workflow**: GitHub Actions workflow that commits predictions before each race weekend.
+- [x] **Done:** Data pipeline: Repo scaffolding, historical data pull, and one parquet per season.
+- [x] **Done:** Pre-race feature set: Reproducible integrity checks for grid and lagged form features.
+- [x] **Done:** Temporal validation split: Train and test split that respects chronological time order.
+- [x] **Done:** Baseline benchmark: Grid position rule baseline to establish lower bound.
+- [ ] **Next:** Calibration report: Systematic tracking of committed predictions vs. actual race outcomes.
+- [ ] **Next:** Automated workflow: GitHub Actions workflow that commits predictions before each race weekend.
 
 ## Status
 
@@ -214,7 +214,7 @@ pre-race feature audit run locally; grid and form have been compared on the
 fixed temporal holdout. No prediction has been committed yet. Last updated
 2026-09-12.
 
-## License
+## Licence
 
 MIT, see [LICENSE](LICENSE). This covers the code. Data under `data/` is
 Jolpica's and is licensed CC BY-NC-SA 4.0, see

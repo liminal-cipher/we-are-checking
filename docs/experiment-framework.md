@@ -56,10 +56,10 @@ They should generally be considered in this order:
 | Feature parameters | How is that information defined? | 5-race lookback | 3, 5, 10 races; season reset rules |
 | Preprocessing | How is the input prepared? | train-only base-rate imputation | scaling, alternative missing-value strategies |
 | Model family | How is the relationship learned? | Logistic Regression | tree-based and boosting models |
-| Hyperparameters | How is that model configured? | model defaults | regularization, tree depth, learning rate |
+| Hyperparameters | How is that model configured? | model defaults | regularisation, tree depth, learning rate |
 | Decision threshold | How does probability become a decision? | 0.5 | thresholds selected for a defined decision objective |
 
-These dimensions should not all be optimized at once.
+These dimensions should not all be optimised at once.
 
 The initial value of a parameter does not imply that it is optimal. For example, the five-race lookback used by `top10_rate_last5` is a starting heuristic and can later be treated as an experimental parameter.
 
@@ -122,7 +122,7 @@ Race happens
         ↓
 Score prediction against actual result
         ↓
-Analyze errors
+Analyse errors
         ↓
 Form a hypothesis about a possible improvement
         ↓
@@ -220,7 +220,7 @@ Threshold selection should happen only after the probability model itself is rea
 
 ### Phase 8: Live prediction
 
-Build a reproducible workflow that obtains all required pre-race inputs, generates probabilities before the prediction cutoff, stores the prediction artifact, and scores it after the result becomes available.
+Build a reproducible workflow that obtains all required pre-race inputs, generates probabilities before the prediction cutoff, stores the prediction artefact, and scores it after the result becomes available.
 
 ## Experiment Records
 
@@ -252,6 +252,6 @@ The result and its interpretation are recorded in `docs/decisions.md`.
 
 Do not use the repeatedly inspected 2025-onward holdout to choose the next
 configuration; it remains an out-of-time reference. Before implementation,
-define one focused modeling hypothesis and change only the experiment dimension
+define one focused modelling hypothesis and change only the experiment dimension
 needed to test that question. Do not select a final feature set or model from
 the current mixed form result alone.

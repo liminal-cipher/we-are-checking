@@ -22,13 +22,13 @@ endpoint returns a whole season of classifications in about five requests. Raw
 HTTP would mean reimplementing pagination, response parsing, type casting, and
 rate limiting, all of which FastF1 already does.
 
-**Revisit if.** We need data the classification endpoint does not carry (tire
+**Revisit if.** We need data the classification endpoint does not carry (tyre
 compounds, sector times, weather). Those live in session data, not here, and
 would be a second loader rather than a replacement for this one.
 
 ## 2026-08-11 Parsed results are committed, the HTTP cache is not
 
-**Context.** The pull produces two artifacts: FastF1's raw HTTP cache and
+**Context.** The pull produces two artefacts: FastF1's raw HTTP cache and
 parsed per-season parquet files. Predictions are generated in GitHub Actions
 before each round, so CI also needs the history.
 
@@ -42,7 +42,7 @@ well under a megabyte) so the usual objection to data in git does not apply.
 The HTTP cache is machine-local, larger, and rebuildable, so it stays out.
 
 **Revisit if.** The committed data grows past a few megabytes, or we start
-storing per-lap data. At that point this becomes a release artifact or a cache
+storing per-lap data. At that point this becomes a release artefact or a cache
 restored by `actions/cache`, not a tracked file.
 
 ## 2026-08-11 Completed seasons are never refetched
@@ -69,11 +69,11 @@ Jolpica licenses its data CC BY-NC-SA 4.0, which is share-alike and
 non-commercial. The repo's own code is MIT.
 
 **Decision.** Keep MIT in `LICENSE` for the code. State the data's separate
-license and its attribution in the README's Data section and in
+licence and its attribution in the README's Data section and in
 `data/raw/README.md`, next to the files it covers.
 
 **Why.** Relicensing someone else's data by dropping it into an MIT repo is not
-something we get to do. Two licenses in one repo is normal as long as the
+something we get to do. Two licences in one repo is normal as long as the
 boundary is written down where a reader will hit it.
 
 **Revisit if.** This project is ever used commercially, which the NC clause
@@ -153,7 +153,7 @@ was mostly noise around a few changed lines of code.
 `.gitattributes` and activated per clone with `nbstripout --install`
 (installed via `requirements-dev.txt`). The committed copy of a notebook
 has no outputs; the working copy keeps them. The existing notebook was
-renormalized under the filter.
+renormalised under the filter.
 
 **Why.** A filter at staging time is the only variant that needs no
 remembering. Local outputs survive, so nothing explored is lost to the
